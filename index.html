@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Conexxa — Career Matcher</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --accent1:#7C3AED; --accent2:#06B6D4;
+      --glass: rgba(255,255,255,0.06); --muted:#9AA4B2;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; font-family:Inter,system-ui,Arial,sans-serif;
+      background: linear-gradient(180deg,#071025 0%, #081228 50%, #071023 100%);
+      color:#e6eef6; display:flex; align-items:center; justify-content:center; padding:36px;
+    }
+
+    .wrap{
+      width:100%; max-width:980px;
+      display:grid; grid-template-columns: 420px 1fr; gap:28px;
+    }
+
+    /* left panel (form) */
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px; padding:20px; box-shadow: 0 10px 30px rgba(6,10,20,0.6);
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    header.brand{
+      display:flex; gap:12px; align-items:center; margin-bottom:6px;
+    }
+    .logo{
+      width:48px; height:48px; border-radius:10px;
+      background: linear-gradient(135deg,var(--accent1),var(--accent2));
+      display:flex; align-items:center; justify-content:center; font-weight:800;
+      color:white; font-size:18px; box-shadow:0 6px 20px rgba(124,58,237,0.18);
+    }
+    h1{margin:0; font-size:20px; letter-spacing:-0.2px}
+    p.lead{margin:6px 0 14px 0; color:var(--muted); font-size:13px}
+
+    label{display:block; font-weight:600; font-size:13px; color:#dfe9f3; margin-top:12px}
+    input[type="text"], textarea{
+      width:100%; padding:10px 12px; margin-top:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.04);
+      background: rgba(255,255,255,0.02); color:inherit; outline:none; font-size:14px;
+      transition: box-shadow .18s, transform .12s;
+    }
+    input[type="text"]:focus, textarea:focus{ box-shadow: 0 6px 18px rgba(6,16,32,0.45); transform: translateY(-1px) }
+
+    /* skill chips input */
+    .chips {
+      display:flex; gap:8px; flex-wrap:wrap; padding:10px; margin-top:8px;
+      border-radius:10px; background: rgba(255,255,255,0.01); border:1px dashed rgba(255,255,255,0.03);
+    }
+    .chip {
+      display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px;
+      background: rgba(255,255,255,0.03); color:#eaf6ff; font-weight:600; font-size:13px;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .chip button{ background:transparent; border:0; color:var(--muted); cursor:pointer; font-weight:700; }
+
+    .small-hint{ font-size:12px; color:var(--muted); margin-top:8px; }
+
+    .actions{ display:flex; gap:10px; margin-top:14px; align-items:center }
+    .btn{
+      display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border-radius:10px; cursor:pointer;
+      font-weight:700; border:0; color:white;
+    }
+    .btn.primary{
+      background: linear-gradient(90deg,var(--accent1),var(--accent2));
+      box-shadow: 0 8px 28px rgba(10,20,40,0.35);
+    }
+    .btn.ghost{
+      background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted); font-weight:600;
+    }
+
+    /* right panel (results) */
+    .results-panel{
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+      padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.03);
+      box-shadow: 0 8px 24px rgba(4,6,10,0.35);
+    }
+    .matches{ display:flex; flex-direction:column; gap:10px }
+    .match{
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
+      padding:12px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.008), rgba(255,255,255,0.006));
+      border:1px solid rgba(255,255,255,0.02);
+      transition: transform .12s, box-shadow .12s;
+    }
+    .match:hover{ transform: translateY(-6px); box-shadow: 0 14px 40px rgba(6,12,30,0.45) }
+    .company{
+      display:flex; align-items:center; gap:12px;
+    }
+    .avatar{
+      width:48px; height:48px; border-radius:10px; background:linear-gradient(135deg,var(--accent2),var(--accent1));
+      display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:18px;
+    }
+    .meta{ color:var(--muted); font-size:13px; margin-top:4px }
+    .score{ font-weight:700; font-size:14px; color:#cfeffd }
+
+    .empty{ color:var(--muted); font-size:14px; text-align:center; padding:18px 8px; }
+
+    /* spinner */
+    .spinner{
+      width:28px; height:28px; border-radius:50%; border:4px solid rgba(255,255,255,0.08);
+      border-top-color: rgba(255,255,255,0.5); animation:spin 1s linear infinite;
+    }
+    @keyframes spin{ to{ transform:rotate(360deg)} }
+
+    /* responsive */
+    @media (max-width:880px){
+      .wrap{ grid-template-columns: 1fr; padding:0 6px }
+      .panel{ order:2 } .results-panel{ order:1 }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- left: form -->
+    <div class="panel" aria-labelledby="title">
+      <div class="brand">
+        <div class="logo">Cx</div>
+        <div>
+          <h1 id="title">Conexxa</h1>
+          <div class="small-hint">AI-powered career matcher • type skills & press Enter</div>
+        </div>
+      </div>
+
+      <p class="lead">Tell me about your skills & goals — I'll find top company matches for you.</p>
+
+      <label for="name">Your name</label>
+      <input id="name" type="text" placeholder="e.g. Abhinavu" />
+
+      <label for="skillInput">Skills</label>
+      <div class="chips" id="chipContainer" tabindex="0">
+        <input id="skillInput" type="text" placeholder="Add a skill and press Enter" style="border:none;background:transparent;flex:1;min-width:140px;color:inherit;outline:none;font-size:14px" />
+      </div>
+      <div class="small-hint">Common skill examples: Python, SQL, Machine Learning, Web Development</div>
+
+      <label for="interests">Interests</label>
+      <input id="interests" type="text" placeholder="e.g. Data Science, Cloud" />
+
+      <label for="goals">Career goals</label>
+      <textarea id="goals" rows="3" placeholder="Short summary of what you're aiming for"></textarea>
+
+      <div class="actions">
+        <button id="findBtn" class="btn primary"><span id="btnText">Find Matches</span></button>
+        <button id="clearBtn" class="btn ghost">Clear</button>
+      </div>
+
+      <div id="formMsg" class="small-hint" style="margin-top:12px"></div>
+    </div>
+
+    <!-- right: results -->
+    <div class="results-panel">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-weight:700">Top Matches</div>
+            <div class="meta" style="margin-top:6px">Personalized suggestions based on your skills</div>
+          </div>
+          <div id="statusIcon" title="status"></div>
+        </div>
+
+        <div id="resultsArea" style="margin-top:12px">
+          <div class="empty">No search yet — add skills and press <strong>Find Matches</strong> ✨</div>
+        </div>
+      </div>
+
+      <div class="card" id="debugCard" style="display:none">
+        <div style="font-weight:700">Debug / Info</div>
+        <pre id="debugPre" style="white-space:pre-wrap;color:var(--muted);font-size:13px;margin-top:8px"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // chips logic
+    const skillInput = document.getElementById('skillInput');
+    const chipContainer = document.getElementById('chipContainer');
+    let skills = [];
+
+    function renderChips(){
+      // remove all nodes except the input
+      chipContainer.querySelectorAll('.chip').forEach(n => n.remove());
+      skills.forEach((s, i) => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.innerHTML = `${escapeHtml(s)} <button data-i="${i}" aria-label="remove">×</button>`;
+        chipContainer.insertBefore(chip, skillInput);
+      })
+    }
+
+    chipContainer.addEventListener('click', (e) => {
+      chipContainer.querySelector('input').focus();
+      if (e.target.tagName === 'BUTTON') {
+        const idx = Number(e.target.dataset.i);
+        skills.splice(idx,1);
+        renderChips();
+      }
+    });
+
+    skillInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        const val = skillInput.value.trim();
+        if (val && !skills.map(s=>s.toLowerCase()).includes(val.toLowerCase())) {
+          skills.push(val);
+          renderChips();
+        }
+        skillInput.value = '';
+      } else if (e.key === 'Backspace' && skillInput.value === '') {
+        // remove last
+        skills.pop();
+        renderChips();
+      }
+    });
+
+    // helper
+    function escapeHtml(text){ return text.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
+
+    // form actions
+    const findBtn = document.getElementById('findBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const resultsArea = document.getElementById('resultsArea');
+    const btnText = document.getElementById('btnText');
+    const statusIcon = document.getElementById('statusIcon');
+    const formMsg = document.getElementById('formMsg');
+    const debugCard = document.getElementById('debugCard');
+    const debugPre = document.getElementById('debugPre');
+
+    async function findMatches(){
+      formMsg.textContent = '';
+      if (skills.length === 0) { formMsg.textContent = 'Please add at least one skill.'; return; }
+
+      // prepare payload
+      const payload = {
+        name: document.getElementById('name').value.trim(),
+        skills: skills,
+        interests: document.getElementById('interests').value.split(',').map(s=>s.trim()).filter(Boolean),
+        goals: document.getElementById('goals').value.trim()
+      };
+
+      // UI -> loading
+      btnText.textContent = 'Searching…';
+      statusIcon.innerHTML = '<div class="spinner" aria-hidden="true"></div>';
+      resultsArea.innerHTML = '';
+
+      try {
+        const res = await fetch('/api/match', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Server error');
+
+        if (data.matches && data.matches.length) {
+          renderMatches(data.matches);
+          // optional debug
+          debugCard.style.display = 'block';
+          debugPre.textContent = `queried_skills: ${data.queried_skills?.join(', ') || '-'}\navailable_company_skills: ${data.available_company_skills?.join(', ') || '-'}`;
+        } else {
+          resultsArea.innerHTML = '<div class="empty">No matches found. Try different skills.</div>';
+          debugCard.style.display = 'none';
+        }
+      } catch (err) {
+        resultsArea.innerHTML = `<div class="empty">Error: ${escapeHtml(err.message)}</div>`;
+        debugCard.style.display = 'none';
+      } finally {
+        btnText.textContent = 'Find Matches';
+        statusIcon.innerHTML = '';
+      }
+    }
+
+    function renderMatches(matches){
+      const container = document.createElement('div');
+      container.className = 'matches';
+      matches.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'match';
+        const initials = m.company.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+        div.innerHTML = `
+          <div class="company">
+            <div class="avatar">${escapeHtml(initials)}</div>
+            <div>
+              <div style="font-weight:700">${escapeHtml(m.company)}</div>
+              <div class="meta">${escapeHtml(m.industry)} • Openings: ${m.openings}</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div class="score">${Number(m.distance).toFixed(3)}</div>
+            <div class="meta" style="margin-top:6px">match score</div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+      resultsArea.innerHTML = '';
+      resultsArea.appendChild(container);
+    }
+
+    findBtn.addEventListener('click', (e) => { e.preventDefault(); findMatches(); });
+    clearBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('name').value=''; document.getElementById('interests').value='';
+      document.getElementById('goals').value=''; skills=[]; renderChips(); resultsArea.innerHTML = '<div class="empty">Cleared — add new skills to search</div>';
+      formMsg.textContent='';
+    });
+
+    // small UX: focus input when container clicked
+    chipContainer.addEventListener('click', ()=> skillInput.focus());
+
+    // initial render
+    renderChips();
+  </script>
+</body>
+</html>
